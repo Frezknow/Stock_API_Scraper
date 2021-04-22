@@ -1,10 +1,12 @@
 package main
 
 import (
-	"io/ioutil"
-
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 // Handler is executed by AWS Lambda in the main function. Once the request
@@ -28,4 +30,15 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 func main() {
 	lambda.Start(Handler)
+	scrapeForCSV()
+}
+
+//scrapeForCSV scrapes data into a CSV file
+func scrapeForCSV() {
+	link := "https://api.polygon.io/v2/reference/financials/AAPL?limit=30&type=Q&sort=calendarDate&apiKey=MBctIb6XJhtdvXZZRTasWYTbt2Qv0FX0"
+	resp, err := http.Get(link)
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println(resp)
 }
