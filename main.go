@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
+	//"github.com/aws/aws-lambda-go/lambda"
+	// "io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 // Handler is executed by AWS Lambda in the main function. Once the request
@@ -29,8 +31,16 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 }
 
 func main() {
-	lambda.Start(Handler)
+	//lambda.Start(Handler)
 	scrapeForCSV()
+}
+
+func isError(err error) bool {
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return (err != nil)
 }
 
 //scrapeForCSV scrapes data into a CSV file
@@ -41,8 +51,12 @@ func scrapeForCSV() {
 		log.Panic(err)
 	}
 	createFile()
-	log.Print(resp)
-	fmt.Println(resp)
+	bodyString, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+	writeFile(string(bodyString))
+	fmt.Println(string(bodyString))
 }
 
 var path = "test.txt"
@@ -61,15 +75,15 @@ func createFile() {
 	fmt.Println("File Created SuccessFully", path)
 }
 
-func writeFile(resp) {
+func writeFile(resp string) {
 	//Open file using READ and WRITE permission
-	var file, err = os.OpenFile(path, os.RDWR, 0644)
+	var file, err = os.OpenFile(path, os.O_RDWR, 0644)
 	if isError(err) {
 		return
 	}
 	defer file.Close()
 	//Write some text to file.
-	_, err = file.WriteString("Hello \n")
+	_, err = file.WriteString(resp)
 	if isError(err) {
 		return
 	}
