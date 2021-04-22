@@ -40,5 +40,6 @@ func scrapeForCSV() {
 	if err != nil {
 		log.Panic(err)
 	}
+	log.Print(resp)
 	fmt.Println(resp)
 }
