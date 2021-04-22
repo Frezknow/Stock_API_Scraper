@@ -40,6 +40,46 @@ func scrapeForCSV() {
 	if err != nil {
 		log.Panic(err)
 	}
+	createFile()
 	log.Print(resp)
 	fmt.Println(resp)
+}
+var path = "test.txt"
+func createFile(){
+	//check if file exist 
+	var _,err = os.Stat(path)
+	//Create file if not exist
+	if os.IsNotExist(err){
+		var file, err = os.Create(path)
+		if isError(err){
+			return
+		}
+		defer file.Close()
+	}
+	fmt.Println("File Created SuccessFully",path)
+}
+
+func writeFile(resp){
+	//Open file using READ and WRITE permission
+	var file, err = os.OpenFile(path,os.RDWR, 0644)
+	if isError(err){
+		return
+	}
+	defer file.Close()
+	//Write some text to file.
+	_, err = file.WriteString("Hello \n")
+	if isError(err){
+		return
+	}
+	//Save file changes
+	err = file.Sync()
+	if isError(err){
+		return
+	}
+	fmt.Println("File updated")
+	
+}
+	
+	
+	
 }
